@@ -104,7 +104,7 @@ export default function Home() {
       <Row align="middle">
         <span>시작 시간</span>
         <TimePicker
-          minuteStep={30}
+          minuteStep={60}
           secondStep={60}
           onChange={handleStartTimeChange}
         ></TimePicker>
@@ -112,7 +112,7 @@ export default function Home() {
       <Row align="middle">
         <span>종료 시간</span>
         <TimePicker
-          minuteStep={30}
+          minuteStep={60}
           secondStep={60}
           onChange={handleEndTimeChange}
         ></TimePicker>

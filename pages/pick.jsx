@@ -4,6 +4,8 @@ import styles from "./pick.module.scss";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/swiper.min.css";
 import "swiper/components/pagination/pagination.min.css";
+import _ from "lodash";
+import moment from "moment";
 
 // import SwiperCore, { Pagination } from "swiper/core";
 // SwiperCore.use([Pagination]);
@@ -15,47 +17,113 @@ function setDigit(num, digitCount) {
 }
 const timeblocks = [];
 
-for (let i = 0; i < 24; i++) {
-  timeblocks.push({ hour: i, minute: 0 });
-  timeblocks.push({ hour: i, minute: 30 });
-}
+const startHour = 10;
+const endHour = 20;
+
+for (let i = startHour; i < endHour + 1; i++) timeblocks.push(i);
+
+const selections = [moment("2021-05-21"), moment("2021-05-30")];
 
 export default function PickPage() {
-  const [selectedTimeblocks, setSelectedTimeblocks] = useState([]);
+  const [selectedTimeblocks, setSelectedTimeblocks] = useState({});
 
   return (
-    <div>
-      <p>날짜</p>
-      <div className={styles.swiperWrapper}>
-        <Swiper
-          slidesPerView="auto"
-          freeMode={true}
-          style={{ padding: 20 }}
-        >
-          {timeblocks.map((timeblock) => (
-            <SwiperSlide>
-              <TimeColumn timeblock={timeblock} isSelected></TimeColumn>
-            </SwiperSlide>
-          ))}
-        </Swiper>
-      </div>
-    </div>
+    <Wrapper>
+      {selections.map((selection) => {
+        return (
+          <>
+            <p>{selection.format("YYYY.MM.DD")}</p>
+            <SwiperContainer>
+              <Swiper slidesPerView={8} freeMode>
+                {timeblocks.map((timeblock, index) => {
+                  // get date key
+                  const dateKey = selection.format("$YYYY_MM_DD");
+
+                  // check within selected timeblocks
+                  const selected =
+                    selectedTimeblocks[dateKey]?.includes(timeblock);
+                  return (
+                    <SwiperSlide key={index}>
+                      <TimeColumn
+                        key={index}
+                        timeblock={timeblock}
+                        selected={selected}
+                        onClick={() => {
+                          // setSelectedTimeblocks(
+                          const res = _.update(
+                            selectedTimeblocks,
+                            dateKey,
+                            (k) =>
+                              _.xor(selectedTimeblocks[dateKey], [timeblock])
+                          );
+
+                          console.log(res)
+                          setSelectedTimeblocks(res)
+                          console.log(selectedTimeblocks)
+                          // );
+                        }}
+                      ></TimeColumn>
+                    </SwiperSlide>
+                  );
+                })}
+              </Swiper>
+            </SwiperContainer>
+          </>
+        );
+      })}
+    </Wrapper>
   );
 }
 
-function TimeColumn({ children, onClick, timeblock, isSelected }) {
+const Wrapper = styled.div`
+  padding: 0 10px;
+  p {
+    margin: 0;
+  }
+`;
+
+const SwiperContainer = styled.div`
+  overflow: hidden;
+`;
+
+function TimeColumn({ children, onClick, timeblock, selected }) {
   return (
-    <div className={styles.timeColumn}>
-      {/* <span className={styles.dateSpan}>오후</span> */}
-      {/* <span className={styles.hourSpan}>{children}</span> */}
-      <div className={[styles.timeCell]}>
+    <TimeColumnWrapper>
+      <TimeCell $selected={selected} onClick={onClick}>
+        <div>{setDigit(timeblock, 2)}:00</div>
         <div>
-          {setDigit(timeblock.hour, 2)}:{setDigit(timeblock.minute, 2)}
+          {setDigit(timeblock + 1, 2)}
+          :00
         </div>
-        <div>
-          {setDigit(timeblock.hour, 2)}:{setDigit(timeblock.minute, 2)}
-        </div>
-      </div>
-    </div>
+      </TimeCell>
+    </TimeColumnWrapper>
   );
 }
+
+const TimeColumnWrapper = styled.div`
+  display: inline-flex;
+  flex-direction: column;
+  width: 100%;
+`;
+
+const TimeCell = styled.div`
+  width: 100%;
+  height: 40px;
+
+  background-color: ${(p) => (p.$selected ? "green" : "gray")};
+  border: 1px solid;
+  border-color: ${(p) => (p.$selected ? "green" : "gray")};
+  transition: background-color 0.2s ease;
+  color: white;
+
+  font-size: 10px;
+
+  text-align: center;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  position: relative;
+`;

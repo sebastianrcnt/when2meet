@@ -23,37 +23,3 @@
 //   // -ms-overflow-style: none; /* IE and Edge */
 //   // scrollbar-width: none; /* Firefox */
 // }
-
-.swiperWrapper {
-  overflow: visible;
-}
-
-.timeColumn {
-  display: inline-flex;
-  flex-direction: column;
-  width: 100%;
-}
-
-.timeCell {
-  width: 100%;
-  height: 50px;
-
-  background-color: green;
-
-  color: white;
-  font-size: 14px;
-
-  text-align: center;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-
-  position: relative;
-
-  &.selected {
-    background-color: gray;
-  }
-}
-
