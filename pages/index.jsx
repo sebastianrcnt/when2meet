@@ -4,12 +4,10 @@ import { Avatar, Button, Row, TimePicker, Input } from "antd";
 import _ from "lodash";
 import DayPicker from "react-day-picker";
 import "react-day-picker/lib/style.css";
+import moment from "moment";
 
 function dateEquals(date1, date2) {
-  const doesYearMatch = date1.year === date2.year;
-  const doesMonthMatch = date1.month === date2.month;
-  const doesDateMatch = date1.date === date2.date;
-  return doesYearMatch && doesMonthMatch && doesDateMatch;
+  return onlyDate(date1).isSame(onlyDate(date2));
 }
 
 function dateSetIncludes(dateSet, targetDate) {
@@ -22,19 +20,21 @@ function dateSetIncludes(dateSet, targetDate) {
   return false;
 }
 
-function toDate(date) {
-  return {
-    year: date.getFullYear(),
-    month: date.getMonth(),
-    date: date.getDate(),
-  };
+function toMoment(date) {
+  return moment(date);
+}
+
+function onlyDate(date) {
+  return date.clone().startOf("day");
 }
 
 export default function Home() {
   const [dates, setDates] = useState([]);
+  const [startTime, setStartTime] = useState(null);
+  const [endTime, setEndTime] = useState(null);
 
   const handleDayClick = (date) => {
-    date = toDate(date);
+    date = onlyDate(toMoment(date));
     let nextDates;
     if (dateSetIncludes(dates, date)) {
       nextDates = dates.filter((d) => !dateEquals(d, date));
@@ -42,6 +42,31 @@ export default function Home() {
       nextDates = [...dates, date];
     }
     setDates(nextDates);
+  };
+
+  const handleStartTimeChange = setStartTime;
+  const handleEndTimeChange = setEndTime;
+  const handleSubmitButtonClick = () => {
+    const isStartTimeSet = !!startTime;
+    const isEndTimeSet = !!endTime;
+    const areDatesSelected = dates.length > 0;
+
+    // validation
+    if (!(isStartTimeSet && isEndTimeSet && areDatesSelected)) {
+      return;
+    }
+
+    // check end time is later than start time
+    const isStartTimeBeforeEndTime = startTime.isBefore(endTime);
+    if (!isStartTimeBeforeEndTime) {
+      return;
+    }
+
+    console.log(
+      dates.map((d) => d.format("YYYY MM DD")),
+      startTime.format("hh:mm"),
+      endTime.format("hh:mm")
+    );
   };
 
   return (
@@ -60,7 +85,7 @@ export default function Home() {
       <Row>
         <DayPicker
           selectedDays={(date) => {
-            return dateSetIncludes(dates, toDate(date));
+            return dateSetIncludes(dates, toMoment(date));
           }}
           onDayClick={handleDayClick}
           modifiersStyles={{
@@ -78,14 +103,24 @@ export default function Home() {
       </StepRow>
       <Row align="middle">
         <span>시작 시간</span>
-        <TimePicker minuteStep={30} secondStep={60}></TimePicker>
+        <TimePicker
+          minuteStep={30}
+          secondStep={60}
+          onChange={handleStartTimeChange}
+        ></TimePicker>
       </Row>
       <Row align="middle">
         <span>종료 시간</span>
-        <TimePicker minuteStep={30} secondStep={60}></TimePicker>
+        <TimePicker
+          minuteStep={30}
+          secondStep={60}
+          onChange={handleEndTimeChange}
+        ></TimePicker>
       </Row>
       <Row>
-        <Button type="primary">등록하기</Button>
+        <Button type="primary" onClick={handleSubmitButtonClick}>
+          등록하기
+        </Button>
       </Row>
     </Container>
   );
