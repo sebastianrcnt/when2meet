@@ -36,10 +36,7 @@ export default function PickPage() {
             <SwiperContainer>
               <Swiper slidesPerView={8} freeMode>
                 {timeblocks.map((timeblock, index) => {
-                  // get date key
                   const dateKey = selection.format("$YYYY_MM_DD");
-
-                  // check within selected timeblocks
                   const selected =
                     selectedTimeblocks[dateKey]?.includes(timeblock);
                   return (
@@ -49,18 +46,17 @@ export default function PickPage() {
                         timeblock={timeblock}
                         selected={selected}
                         onClick={() => {
-                          // setSelectedTimeblocks(
-                          const res = _.update(
-                            selectedTimeblocks,
+                          let selectedTimeblocksCopy =
+                            _.cloneDeep(selectedTimeblocks);
+                          const nextSelectedTimeblocks = _.update(
+                            selectedTimeblocksCopy,
                             dateKey,
                             (k) =>
-                              _.xor(selectedTimeblocks[dateKey], [timeblock])
+                              _.xor(selectedTimeblocksCopy[dateKey], [
+                                timeblock,
+                              ])
                           );
-
-                          console.log(res)
-                          setSelectedTimeblocks(res)
-                          console.log(selectedTimeblocks)
-                          // );
+                          setSelectedTimeblocks(nextSelectedTimeblocks);
                         }}
                       ></TimeColumn>
                     </SwiperSlide>

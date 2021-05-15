@@ -63,14 +63,15 @@ export default function Home() {
     }
 
     console.log(
-      dates.map((d) => d.format("YYYY MM DD")),
-      startTime.format("hh:mm"),
-      endTime.format("hh:mm")
+      dates.map((d) => d.format("YYYY-MM-DD")),
+      startTime.format("hh"),
+      endTime.format("hh")
     );
   };
 
   return (
     <Container>
+      <h1>새로운 모임 등록하기</h1>
       <StepRow>
         <Avatar size="small">1</Avatar>
         <StepText>모임 제목</StepText>
@@ -102,7 +103,7 @@ export default function Home() {
         <StepText>시간대를 선택하세요</StepText>
       </StepRow>
       <Row align="middle">
-        <span>시작 시간</span>
+        <TimeLabel>시작 시간</TimeLabel>
         <TimePicker
           minuteStep={60}
           secondStep={60}
@@ -110,14 +111,15 @@ export default function Home() {
         ></TimePicker>
       </Row>
       <Row align="middle">
-        <span>종료 시간</span>
+        <TimeLabel>종료 시간</TimeLabel>
         <TimePicker
           minuteStep={60}
           secondStep={60}
           onChange={handleEndTimeChange}
         ></TimePicker>
       </Row>
-      <Row>
+      <SizedBox height={30}></SizedBox>
+      <Row align="end">
         <Button type="primary" onClick={handleSubmitButtonClick}>
           등록하기
         </Button>
@@ -127,8 +129,11 @@ export default function Home() {
 }
 
 const Container = styled.div`
-  width: 100vw;
-  height: 100vh;
+  width: calc(100vw - 40px);
+  height: calc(100vh - 20px);
+
+  margin: 10px 20px;
+  background-color: white;
 `;
 
 const SizedBox = styled.div`
@@ -147,4 +152,11 @@ const StepRow = styled.div`
   ${StepText} {
     margin-left: 5px;
   }
+
+  margin-top: 10px;
+  margin-bottom: 4px;
+`;
+
+const TimeLabel = styled.label`
+  margin-right: 10px;
 `;
